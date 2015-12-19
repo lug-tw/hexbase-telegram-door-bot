@@ -17,7 +17,7 @@ import sys
 import logging
 
 SOCKET_PATH = '/tmp/doorctl'
-LOG_PATH = 'doorlog'
+LOG_PATH = '/tmp/doorlog'
 
 
 class Doorctl:

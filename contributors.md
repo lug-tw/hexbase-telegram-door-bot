@@ -1,0 +1,7 @@
+# contributors
+
+- @rsghost
+
+- @xatier
+
+- @ronmi

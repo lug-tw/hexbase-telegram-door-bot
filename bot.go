@@ -1,11 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"os/exec"
+	"os"
 	"strings"
 
 	"github.com/Patrolavia/botgoram/telegram"
@@ -13,7 +13,6 @@ import (
 
 var (
 	key         string
-	gpiocmdPipe *io.PipeWriter
 	api         telegram.API
 	bot         *telegram.User
 	doorManager = map[string]bool{
@@ -21,9 +20,17 @@ var (
 		"xatier":  true,
 		"ronmi":   true,
 	}
+	doorctl string
 )
 
 func init() {
+	// get named pipe to control door
+	flag.StringVar(&doorctl, "s", "/tmp/doorctl", "path to unix socket for controlling door")
+	flag.Parse()
+	if _, err := os.Stat(doorctl); err != nil {
+		log.Fatalf("doorctl %s does not exists!")
+	}
+
 	keyBytes, err := ioutil.ReadFile("key")
 	if err != nil {
 		log.Fatalf("Cannot load bot token from key file: %s\n", err)
@@ -34,41 +41,6 @@ func init() {
 	if bot, err = api.Me(); err != nil {
 		log.Fatalf("Error validating bot token: %s", err)
 	}
-
-	// XXX: change this to a Unix domain socekt conneting to /tmp/doorctl
-	gpiocmd := exec.Command("python", "door.py")
-	gpiocmd.Stdin, gpiocmdPipe = io.Pipe()
-	if err := gpiocmd.Start(); err != nil {
-		log.Fatalf("Can't run door.py: %s", err)
-	}
-}
-
-func processMessage(message *telegram.Message) (passed bool) {
-	defer fmt.Printf("[%s]: %s -> %s]\n",
-		message.Chat.Title, message.Sender.Username, message.Text)
-
-	if doorManager[message.Sender.Username] {
-		switch message.Text {
-		case "/ping":
-			api.SendMessage(message.Chat,
-				"pong, "+message.Sender.FirstName+"!", nil)
-		case "/up":
-			fmt.Fprintln(gpiocmdPipe, "up")
-			api.SendMessage(message.Chat, "door up!", nil)
-
-		case "/down":
-			fmt.Fprintln(gpiocmdPipe, "down")
-			api.SendMessage(message.Chat, "door down!", nil)
-
-		case "/stop":
-			fmt.Fprintln(gpiocmdPipe, "stop")
-			api.SendMessage(message.Chat, "door stop!", nil)
-		default:
-			return true
-		}
-	}
-
-	return
 }
 
 func main() {

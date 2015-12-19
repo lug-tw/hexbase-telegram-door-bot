@@ -29,6 +29,7 @@ func init() {
 		log.Fatalf("Cannot initialize bot: %s", err)
 	}
 
+	// XXX: change this to a Unix domain socekt conneting to /tmp/doorctl
 	gpiocmd := exec.Command("python", "door.py")
 	gpiocmd.Stdin, gpiocmdPipe = io.Pipe()
 	if err := gpiocmd.Start(); err != nil {

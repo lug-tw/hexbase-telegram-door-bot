@@ -9,12 +9,19 @@ The log is recorded at `LOG_PATH`.
 testing:
 
     socat - UNIX-CONNECT:/tmp/doorctl
+
+GPIO pins:
+
+https://www.raspberrypi.org/documentation/usage/gpio/images/a-and-b-gpio-numbers.png
 """
 
+import RPi.GPIO as GPIO
+
+import logging
 import os
 import socket
 import sys
-import logging
+import time
 
 SOCKET_PATH = '/tmp/doorctl'
 LOG_PATH = '/tmp/doorlog'
@@ -40,7 +47,11 @@ class Doorctl:
         self.sock.bind(SOCKET_PATH)
         self.sock.listen(1)
 
-        self.support_commands = ['stop', 'up', 'down']
+        self.support_commands = ['stop', 'up', 'down', 'clean']
+
+        # GPIO setup
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
 
     def read(self):
         """
@@ -62,18 +73,36 @@ class Doorctl:
             self.up()
         elif cmd == 'down':
             self.down()
+        elif cmd == 'clean':
+            self.clean()
 
     def stop(self):
         logging.info('Door STOP')
-        pass
+        port=25
+        GPIO.setup(port, GPIO.OUT)
+        GPIO.output(port, 1)
+        time.sleep(0.5)
+        GPIO.output(port, 0)
 
     def up(self):
         logging.info('Door UP')
-        pass
+        port=7
+        GPIO.setup(port, GPIO.OUT)
+        GPIO.output(port, 1)
+        time.sleep(0.5)
+        GPIO.output(port, 0)
 
     def down(self):
         logging.info('Door DOWN')
-        pass
+        port=8
+        GPIO.setup(port, GPIO.OUT)
+        GPIO.output(port, 1)
+        time.sleep(0.5)
+        GPIO.output(port, 0)
+
+    def clean(self):
+        GPIO.cleanup()
+
 
 
 if __name__ == '__main__':

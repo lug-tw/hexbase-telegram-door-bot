@@ -34,7 +34,7 @@ goimports -w bot.go
 GOARCH=arm go build -a
 
 # install
-scp bot rspi:~/dev/door/
+scp hexbase-telegram-door-bot rspi:~/dev/door/
 ```
 
 ## Hardware

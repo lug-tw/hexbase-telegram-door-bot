@@ -1,0 +1,13 @@
+[Unit]
+Description=HexBase door control daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=<<<path to hexbase-telegram-door-bot>>>/systemd/doorctl_systemd.sh
+
+ExecStop=/usr/bin/pkill daemon.py
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target

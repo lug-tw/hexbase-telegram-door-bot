@@ -7,15 +7,20 @@ import (
 	"log"
 	"os/exec"
 	"strings"
-	"time"
 
-	"github.com/tucnak/telebot"
+	"github.com/Patrolavia/botgoram/telegram"
 )
 
 var (
 	key         string
 	gpiocmdPipe *io.PipeWriter
-	bot         *telebot.Bot
+	api         telegram.API
+	bot         *telegram.User
+	doorManager = map[string]bool{
+		"rsghost": true,
+		"xatier":  true,
+		"ronmi":   true,
+	}
 )
 
 func init() {
@@ -25,8 +30,9 @@ func init() {
 	}
 	key = strings.TrimSpace(string(keyBytes))
 
-	if bot, err = telebot.NewBot(key); err != nil {
-		log.Fatalf("Cannot initialize bot: %s", err)
+	api = telegram.New(key)
+	if bot, err = api.Me(); err != nil {
+		log.Fatalf("Error validating bot token: %s", err)
 	}
 
 	// XXX: change this to a Unix domain socekt conneting to /tmp/doorctl
@@ -37,38 +43,54 @@ func init() {
 	}
 }
 
-func main() {
-	doorManager := map[string]bool{
-		"rsghost": true,
-		"xatier":  true,
-		"ronmi":   true,
+func processMessage(message *telegram.Message) (passed bool) {
+	defer fmt.Printf("[%s]: %s -> %s]\n",
+		message.Chat.Title, message.Sender.Username, message.Text)
+
+	if doorManager[message.Sender.Username] {
+		switch message.Text {
+		case "/ping":
+			api.SendMessage(message.Chat,
+				"pong, "+message.Sender.FirstName+"!", nil)
+		case "/up":
+			fmt.Fprintln(gpiocmdPipe, "up")
+			api.SendMessage(message.Chat, "door up!", nil)
+
+		case "/down":
+			fmt.Fprintln(gpiocmdPipe, "down")
+			api.SendMessage(message.Chat, "door down!", nil)
+
+		case "/stop":
+			fmt.Fprintln(gpiocmdPipe, "stop")
+			api.SendMessage(message.Chat, "door stop!", nil)
+		default:
+			return true
+		}
 	}
 
-	messages := make(chan telebot.Message)
-	bot.Listen(messages, 1*time.Second)
+	return
+}
+
+func main() {
+	messages := make(chan *telegram.Message)
+	go func(messages chan *telegram.Message) {
+		offset := 0
+		for {
+			updates, err := api.GetUpdates(offset, 0, 30) // 30s timeout for long-polling
+			if err != nil {
+				fmt.Printf("Cannot fetch new messages: %s", err)
+				continue
+			}
+			for _, update := range updates {
+				offset++
+				messages <- update.Message
+			}
+		}
+	}(messages)
+
 	fmt.Println("Waiting for commands")
 
 	for message := range messages {
-		fmt.Printf("[%s]: %s -> %s]\n",
-			message.Chat.Title, message.Sender.Username, message.Text)
-
-		if doorManager[message.Sender.Username] {
-			switch message.Text {
-			case "/ping":
-				bot.SendMessage(message.Chat,
-					"pong, "+message.Sender.FirstName+"!", nil)
-			case "/up":
-				fmt.Fprintln(gpiocmdPipe, "up")
-				bot.SendMessage(message.Chat, "door up!", nil)
-
-			case "/down":
-				fmt.Fprintln(gpiocmdPipe, "down")
-				bot.SendMessage(message.Chat, "door down!", nil)
-
-			case "/stop":
-				fmt.Fprintln(gpiocmdPipe, "stop")
-				bot.SendMessage(message.Chat, "door stop!", nil)
-			}
-		}
+		processMessage(message)
 	}
 }

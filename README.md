@@ -12,15 +12,23 @@ A [telegram](https://telegram.org/) bot for the roll-up door of [HexBase](https:
 |`/stop`|stop scrolling |
 
 
-## Development steps
+# Contribute
 
 ```shell
-# hack hack hack
-vim bot.go
+# setup go env and download goimports
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+which goimports || go install golang.org/x/tools/cmd/goimports
 
+# fetch newest code
+go get -ud github.com/lug-tw/hexbase-telegram-door-bot
 
-$GOPATH/bin/goimports -w bot.go
-gofmt -w bot.go
+# hack, hack, hack
+cd $GOPATH/src/github.com/lug-tw/hexbase-telegram-door-bot
+your_favorite_editor bot.go
+
+# reformat the code, build and upload
+goimports -w bot.go
 
 # cross compile to Raspberry Pi architecture
 GOARCH=arm go build -a

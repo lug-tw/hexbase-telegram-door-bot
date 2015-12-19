@@ -1,3 +1,7 @@
+"""
+This is deprecated, try daemon.py and systemd
+"""
+
 import RPi.GPIO as GPIO
 import time
 

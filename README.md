@@ -28,3 +28,11 @@ GOARCH=arm go build -a
 # install
 scp bot rspi:~/dev/door/
 ```
+
+## Hardware
+
+- Our Raspberry Pi and the bread board
+
+![img](https://i.imgur.com/yo0Fa0L.jpg)
+
+![img](https://i.imgur.com/xrI2j9K.jpg)

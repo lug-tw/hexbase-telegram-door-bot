@@ -53,13 +53,13 @@ func (a *AuthValidate) Actions() (enter botgoram.Action, leave botgoram.Action) 
 		ok, err := a.Config.Authenticate(strings.TrimSpace(msg.Text))
 		if !ok || err != nil {
 			api.SendMessage(current.User(), "Password incorrect.", nil)
-			current.Transit("")
 			return nil
 		}
 
 		a.Admins.Add(current.User().ToUser())
 		api.SendMessage(current.User(), "You are administrator now.", nil)
 
+		current.Transit("")
 		return nil
 	}
 	return
@@ -75,6 +75,16 @@ func (a *AuthValidate) Transitors() []botgoram.TransitorMap {
 			State: "auth:askpass",
 			Type:  telegram.TEXT,
 			Desc:  `Validate the password`,
+		},
+		botgoram.TransitorMap{
+			Transitor: func(msg *telegram.Message, state botgoram.State) (next string, err error) {
+				next = ""
+				return
+			},
+			IsHidden: true,
+			State:    "",
+			Type:     telegram.CONTACT,
+			Desc:     `Done validating`,
 		},
 	}
 }

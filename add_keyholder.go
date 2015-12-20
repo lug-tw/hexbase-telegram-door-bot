@@ -91,7 +91,7 @@ func (a *AddValidate) Transitors() []botgoram.TransitorMap {
 			IsHidden: true,
 			State:    "",
 			Type:     telegram.CONTACT,
-			Desc:     `Validate the contact info`,
+			Desc:     `Done validating`,
 		},
 	}
 }

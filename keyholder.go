@@ -12,7 +12,7 @@ import (
 type KeyHolderManager interface {
 	Add(user *telegram.User) (err error)
 	Remove(user *telegram.User) (err error)
-	Is(user *telegram.User) bool
+	Has(user *telegram.User) bool
 }
 
 type keyholder struct {
@@ -59,7 +59,7 @@ func (a *keyholder) Remove(user *telegram.User) (err error) {
 	return export(a.filename, a.users)
 }
 
-func (a *keyholder) Is(user *telegram.User) bool {
+func (a *keyholder) Has(user *telegram.User) bool {
 	return a.users[user.ID]
 }
 

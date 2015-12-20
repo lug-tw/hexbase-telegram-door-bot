@@ -48,7 +48,7 @@ func TestLoadKHM(t *testing.T) {
 
 	for _, uid := range uids {
 		u := initUser(uid)
-		if !kh.Is(u) {
+		if !kh.Has(u) {
 			t.Errorf("User#%D should be a keyholder, but KHM return false", uid)
 		}
 	}
@@ -64,14 +64,14 @@ func TestAddKH(t *testing.T) {
 
 	u := initUser(4)
 	kh.Add(u)
-	if !kh.Is(u) {
+	if !kh.Has(u) {
 		t.Errorf("User#%D should be a keyholder, but KHM return false", u.ID)
 	}
 	kh2, err := LoadKeyholders(fn)
 	if err != nil {
 		t.Fatalf("Failed to load keyholder again: %s", err)
 	}
-	if !kh2.Is(u) {
+	if !kh2.Has(u) {
 		t.Errorf("User#%D should be a keyholder, but second KHM return false", u.ID)
 	}
 }
@@ -85,14 +85,14 @@ func TestRemoveKH(t *testing.T) {
 
 	u := initUser(3)
 	kh.Remove(u)
-	if kh.Is(u) {
+	if kh.Has(u) {
 		t.Errorf("User#%D should not be a keyholder, but KHM return true", u.ID)
 	}
 	kh2, err := LoadKeyholders(fn)
 	if err != nil {
 		t.Fatalf("Failed to load keyholder again: %s", err)
 	}
-	if kh2.Is(u) {
+	if kh2.Has(u) {
 		t.Errorf("User#%D should not be a keyholder, but second KHM return true", u.ID)
 	}
 }

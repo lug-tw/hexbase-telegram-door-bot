@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Patrolavia/botgoram/telegram"
 )
@@ -53,9 +54,24 @@ func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 		c.chatCommand("down", message.Chat)
 	case "/stop":
 		c.chatCommand("stop", message.Chat)
+	case "/list":
+		c.listHolders(message.Sender)
 	default:
 		return true
 	}
 
 	return false
+}
+
+func (c *CommandProcesser) listHolders(u *telegram.User) {
+	reply := fmt.Sprintf(
+		`Administrators:
+%s
+
+Key holders:
+%s`,
+		"@"+strings.Join(c.Admins.List(), ", @"),
+		"@"+strings.Join(c.Members.List(), ", @"),
+	)
+	c.Telegram.SendMessage(u, reply, nil)
 }

@@ -13,6 +13,7 @@ type KeyHolderManager interface {
 	Add(user *telegram.User) (err error)
 	Remove(user *telegram.User) (err error)
 	Has(user *telegram.User) bool
+	List() []string
 }
 
 type keyholder struct {
@@ -41,6 +42,16 @@ func export(filename string, users map[string]bool) (err error) {
 	}
 	_, err = f.Write(data)
 	return
+}
+
+func (a *keyholder) List() []string {
+	ret := make([]string, 0, len(a.users))
+	for u, valid := range a.users {
+		if valid {
+			ret = append(ret, u)
+		}
+	}
+	return ret
 }
 
 func (a *keyholder) Add(user *telegram.User) (err error) {

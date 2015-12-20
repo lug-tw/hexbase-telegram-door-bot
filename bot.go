@@ -11,19 +11,14 @@ import (
 	"github.com/Patrolavia/botgoram/telegram"
 )
 
-var (
-	key         string
-	api         telegram.API
-	bot         *telegram.User
-	doorManager = map[string]bool{
+func main() {
+	var doorctl string
+	doorManager := map[string]bool{
 		"rsghost": true,
 		"xatier":  true,
 		"ronmi":   true,
 	}
-	doorctl string
-)
 
-func init() {
 	// get named pipe to control door
 	flag.StringVar(&doorctl, "s", "/tmp/doorctl", "path to unix socket for controlling door")
 	flag.Parse()
@@ -35,15 +30,20 @@ func init() {
 	if err != nil {
 		log.Fatalf("Cannot load bot token from key file: %s\n", err)
 	}
-	key = strings.TrimSpace(string(keyBytes))
+	key := strings.TrimSpace(string(keyBytes))
 
-	api = telegram.New(key)
-	if bot, err = api.Me(); err != nil {
+	api := telegram.New(key)
+	if _, err = api.Me(); err != nil {
 		log.Fatalf("Error validating bot token: %s", err)
 	}
-}
 
-func main() {
+
+	processer := &CommandProcesser{
+		Control: DoorControl(doorctl),
+		Telegram: api,
+		DoorManager: doorManager,
+	}
+
 	messages := make(chan *telegram.Message)
 	go func(messages chan *telegram.Message) {
 		offset := 0
@@ -63,6 +63,6 @@ func main() {
 	fmt.Println("Waiting for commands")
 
 	for message := range messages {
-		processMessage(message)
+		processer.Handle(message)
 	}
 }

@@ -7,8 +7,10 @@ import (
 	"github.com/Patrolavia/botgoram/telegram"
 )
 
-func sendDoorCommand(cmd string) (err error) {
-	f, err := os.Open(doorctl)
+type DoorControl string
+
+func (d DoorControl) Send(cmd string) (err error) {
+	f, err := os.Open(string(d))
 	if err != nil {
 		return
 	}
@@ -18,30 +20,36 @@ func sendDoorCommand(cmd string) (err error) {
 	return
 }
 
-func processCommand(cmd string, chat *telegram.Chat) {
+type CommandProcesser struct {
+	Control     DoorControl
+	Telegram    telegram.API
+	DoorManager map[string]bool
+}
+
+func (c *CommandProcesser) chatCommand(cmd string, chat *telegram.Chat) {
 	reply := "door " + cmd + "!"
-	if err := sendDoorCommand(cmd); err != nil {
+	if err := c.Control.Send(cmd); err != nil {
 		reply = fmt.Sprintf("Error sending command %s: %s", cmd, err)
 		fmt.Println(reply)
 	}
-	api.SendMessage(chat, reply, nil)
+	c.Telegram.SendMessage(chat, reply, nil)
 }
 
-func processMessage(message *telegram.Message) (pass bool) {
+func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 	defer fmt.Printf("[%s]: %s -> %s]\n",
 		message.Chat.Title, message.Sender.Username, message.Text)
 
-	if doorManager[message.Sender.Username] {
+	if c.DoorManager[message.Sender.Username] {
 		switch message.Text {
 		case "/ping":
-			api.SendMessage(message.Chat,
+			c.Telegram.SendMessage(message.Chat,
 				"pong, "+message.Sender.FirstName+"!", nil)
 		case "/up":
-			processCommand("up", message.Chat)
+			c.chatCommand("up", message.Chat)
 		case "/down":
-			processCommand("down", message.Chat)
+			c.chatCommand("down", message.Chat)
 		case "/stop":
-			processCommand("stop", message.Chat)
+			c.chatCommand("stop", message.Chat)
 		default:
 			return true
 		}

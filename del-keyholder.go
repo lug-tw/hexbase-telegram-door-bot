@@ -118,9 +118,9 @@ func (a *DelValidate) Transitors() []botgoram.TransitorMap {
 
 func registerDelKHStates(fsm botgoram.FSM, admins KeyHolderManager, kh KeyHolderManager) {
 	_, err := fsm.MakeState(&DelAskContact{
-		Admins:  admins,
+		Admins:     admins,
 		KeyHolders: kh,
-		Command: "/del",
+		Command:    "/del",
 	})
 	if err != nil {
 		log.Fatalf("Error registering state delkh:askcontact: %s", err)

@@ -119,7 +119,7 @@ func main() {
 	registerAuthStates(fsm, otpcfg, admins)
 	registerAddKHStates(fsm, admins, khs)
 	registerDelKHStates(fsm, admins, khs)
-	
+
 	// register fallback
 	initState, _ := fsm.State("")
 	initState.RegisterFallback(func(msg *telegram.Message, state botgoram.State) (next string, err error) {

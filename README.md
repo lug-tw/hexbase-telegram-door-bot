@@ -11,8 +11,18 @@ A [telegram](https://telegram.org/) bot for the roll-up door of [HexBase](https:
 |`/down`|scroll down    |
 |`/stop`|stop scrolling |
 
+# Synopsis
+
+- Prepare hardware.
+- Install python and go (>=1.5)
+- Build binary.
+- Prepare telegram bot token, put it into a file.
+- `python daemon.py`
+- `hexbase-telegram-door-bot -k 10_bytes_hexdecimal_string_as_secret_key -t your_token_file`
 
 # Contribute
+
+### Go part
 
 ```shell
 # setup go env and download goimports

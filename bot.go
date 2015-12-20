@@ -117,6 +117,7 @@ func main() {
 	)
 
 	registerAuthStates(fsm, otpcfg, admins)
+	registerAddKHStates(fsm, admins, khs)
 
 	// register fallback
 	initState, _ := fsm.State("")

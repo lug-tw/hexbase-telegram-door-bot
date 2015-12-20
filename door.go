@@ -10,7 +10,7 @@ import (
 type DoorControl string
 
 func (d DoorControl) Send(cmd string) (err error) {
-	f, err := os.Open(string(d))
+	f, err := os.Create(string(d))
 	if err != nil {
 		return
 	}

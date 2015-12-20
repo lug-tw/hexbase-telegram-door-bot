@@ -64,14 +64,22 @@ func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 }
 
 func (c *CommandProcesser) listHolders(u *telegram.User) {
+	mkstr := func (kl KeyHolderManager) (ret string) {
+		arr := kl.List()
+		if len(arr) > 0 {
+			ret = "@" + strings.Join(arr, ", @")
+		}
+		return
+	}
+	
 	reply := fmt.Sprintf(
 		`Administrators:
 %s
 
 Key holders:
 %s`,
-		"@"+strings.Join(c.Admins.List(), ", @"),
-		"@"+strings.Join(c.Members.List(), ", @"),
+		mkstr(c.Admins),
+		mkstr(c.Members),
 	)
 	c.Telegram.SendMessage(u, reply, nil)
 }

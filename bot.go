@@ -49,12 +49,14 @@ func main() {
 		adminfile string
 		khfile    string
 		secretkey string
+		dumpmap   string
 	)
 	flag.StringVar(&doorctl, "s", "/tmp/doorctl", "path to unix socket for controlling door")
 	flag.StringVar(&tokenfile, "t", "token", "file contains telegram bot token")
 	flag.StringVar(&adminfile, "a", "admins", "file stores administrator lists")
 	flag.StringVar(&khfile, "h", "keyholders", "file stores keyholder lists")
 	flag.StringVar(&secretkey, "k", "", "10bytes secret key in hexdecimal")
+	flag.StringVar(&dumpmap, "m", "", "dump state map to this file")
 	flag.Parse()
 	// get named pipe to control door
 	if _, err := os.Stat(doorctl); err != nil {
@@ -131,6 +133,11 @@ func main() {
 		// ignore invalid command
 		return
 	})
+
+	if dumpmap != "" {
+		dot := fsm.StateMap("doorbot")
+		ioutil.WriteFile(dumpmap, []byte(dot), 0644)
+	}
 
 	fmt.Println("Waiting messages.")
 	err = fsm.Start(30)

@@ -21,9 +21,10 @@ func (d DoorControl) Send(cmd string) (err error) {
 }
 
 type CommandProcesser struct {
-	Control     DoorControl
-	Telegram    telegram.API
-	DoorManager map[string]bool
+	Control  DoorControl
+	Telegram telegram.API
+	Admins   KeyHolderManager
+	Members  KeyHolderManager
 }
 
 func (c *CommandProcesser) chatCommand(cmd string, chat *telegram.Chat) {
@@ -39,7 +40,7 @@ func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 	defer fmt.Printf("[%s]: %s -> %s]\n",
 		message.Chat.Title, message.Sender.Username, message.Text)
 
-	if c.DoorManager[message.Sender.Username] {
+	if c.Admins.Has(message.Sender) || c.Members.Has(message.Sender) {
 		switch message.Text {
 		case "/ping":
 			c.Telegram.SendMessage(message.Chat,

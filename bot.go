@@ -12,21 +12,23 @@ import (
 )
 
 func main() {
-	var doorctl string
-	doorManager := map[string]bool{
-		"rsghost": true,
-		"xatier":  true,
-		"ronmi":   true,
-	}
-
-	// get named pipe to control door
+	var (
+		doorctl   string
+		keyfile   string
+		adminfile string
+		khfile    string
+	)
 	flag.StringVar(&doorctl, "s", "/tmp/doorctl", "path to unix socket for controlling door")
+	flag.StringVar(&keyfile, "k", "key", "file contains telegram bot token")
+	flag.StringVar(&adminfile, "a", "admins", "file stores administrator lists")
+	flag.StringVar(&khfile, "h", "keygolders", "file stores keyholder lists")
 	flag.Parse()
+	// get named pipe to control door
 	if _, err := os.Stat(doorctl); err != nil {
 		log.Fatalf("doorctl %s does not exists!")
 	}
 
-	keyBytes, err := ioutil.ReadFile("key")
+	keyBytes, err := ioutil.ReadFile(keyfile)
 	if err != nil {
 		log.Fatalf("Cannot load bot token from key file: %s\n", err)
 	}
@@ -37,11 +39,20 @@ func main() {
 		log.Fatalf("Error validating bot token: %s", err)
 	}
 
+	admins, err := LoadKeyholders(adminfile)
+	if err != nil {
+		log.Fatalf("Cannot load admins from %s: %s", adminfile, err)
+	}
+	khs, err := LoadKeyholders(khfile)
+	if err != nil {
+		log.Fatalf("Cannot load keyholders from %s: %s", khfile, err)
+	}
 
 	processer := &CommandProcesser{
-		Control: DoorControl(doorctl),
+		Control:  DoorControl(doorctl),
 		Telegram: api,
-		DoorManager: doorManager,
+		Admins:   admins,
+		Members:  khs,
 	}
 
 	messages := make(chan *telegram.Message)

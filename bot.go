@@ -19,11 +19,11 @@ import (
 type MockTelegram struct {
 	telegram.API
 	Processer *CommandProcesser
-	max     int
+	max       int
 }
 
 func (m *MockTelegram) GetUpdates(offset, limit, timeout int) (updates []telegram.Update, err error) {
-	if (offset < m.max) {
+	if offset < m.max {
 		offset = m.max
 	}
 	if updates, err = m.API.GetUpdates(offset, limit, timeout); err != nil {
@@ -32,8 +32,8 @@ func (m *MockTelegram) GetUpdates(offset, limit, timeout int) (updates []telegra
 
 	ret := make([]telegram.Update, 0, len(updates))
 	for _, update := range updates {
-		if (m.max <= update.ID) {
-			m.max = update.ID+1
+		if m.max <= update.ID {
+			m.max = update.ID + 1
 		}
 		if m.Processer.Handle(update.Message) {
 			ret = append(ret, update)
@@ -92,8 +92,8 @@ func main() {
 	otpuri := otpcfg.ProvisionURIWithIssuer("DoorControl", "Hexbase")
 	fmt.Println("OTP uri:", otpuri)
 	fmt.Println(
-		"QRCode url: https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl="+
-		url.QueryEscape(otpuri),
+		"QRCode url: https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl=" +
+			url.QueryEscape(otpuri),
 	)
 
 	mock := &MockTelegram{
@@ -127,7 +127,7 @@ func main() {
 
 	// register fallback
 	initState, _ := fsm.State("")
-	initState.RegisterFallback(func (msg *telegram.Message, state botgoram.State) (next string, err error) {
+	initState.RegisterFallback(func(msg *telegram.Message, state botgoram.State) (next string, err error) {
 		// ignore invalid command
 		return
 	})

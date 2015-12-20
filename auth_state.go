@@ -3,9 +3,9 @@ package main
 import (
 	"strings"
 
-	"github.com/dgryski/dgoogauth"
 	"github.com/Patrolavia/botgoram"
 	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/dgryski/dgoogauth"
 )
 
 type AuthAskPass string

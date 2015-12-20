@@ -47,6 +47,19 @@ GOARCH=arm go build -a
 scp hexbase-telegram-door-bot rspi:~/dev/door/
 ```
 
+### Python
+
+```shell
+# install flake8 syntax checker
+sudo pacman -S flake8
+
+# hack, hack, hack
+your_favorite_editor daemon.py
+
+# run syntax check
+flake8 daemon.py
+```
+
 ## Hardware
 
 - Our Raspberry Pi and the bread board

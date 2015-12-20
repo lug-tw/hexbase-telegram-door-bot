@@ -78,7 +78,7 @@ class Doorctl:
 
     def stop(self):
         logging.info('Door STOP')
-        port=25
+        port = 25
         GPIO.setup(port, GPIO.OUT)
         GPIO.output(port, 1)
         time.sleep(0.5)
@@ -86,7 +86,7 @@ class Doorctl:
 
     def up(self):
         logging.info('Door UP')
-        port=7
+        port = 7
         GPIO.setup(port, GPIO.OUT)
         GPIO.output(port, 1)
         time.sleep(0.5)
@@ -94,7 +94,7 @@ class Doorctl:
 
     def down(self):
         logging.info('Door DOWN')
-        port=8
+        port = 8
         GPIO.setup(port, GPIO.OUT)
         GPIO.output(port, 1)
         time.sleep(0.5)
@@ -102,7 +102,6 @@ class Doorctl:
 
     def clean(self):
         GPIO.cleanup()
-
 
 
 if __name__ == '__main__':

@@ -17,18 +17,18 @@ type KeyHolderManager interface {
 
 type keyholder struct {
 	filename string
-	users    map[int]bool
+	users    map[string]bool
 	*sync.Mutex
 }
 
-func export(filename string, users map[int]bool) (err error) {
+func export(filename string, users map[string]bool) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	validKeyholder := make([]int, 0, len(users))
+	validKeyholder := make([]string, 0, len(users))
 	for user, valid := range users {
 		if valid {
 			validKeyholder = append(validKeyholder, user)
@@ -44,27 +44,36 @@ func export(filename string, users map[int]bool) (err error) {
 }
 
 func (a *keyholder) Add(user *telegram.User) (err error) {
+	if user.Username == "" {
+		return
+	}
 	a.Lock()
 	defer a.Unlock()
 
-	a.users[user.ID] = true
+	a.users[user.Username] = true
 	return export(a.filename, a.users)
 }
 
 func (a *keyholder) Remove(user *telegram.User) (err error) {
+	if user.Username == "" {
+		return
+	}
 	a.Lock()
 	defer a.Unlock()
 
-	delete(a.users, user.ID)
+	delete(a.users, user.Username)
 	return export(a.filename, a.users)
 }
 
 func (a *keyholder) Has(user *telegram.User) bool {
-	return a.users[user.ID]
+	if user.Username == "" {
+		return false
+	}
+	return a.users[user.Username]
 }
 
 func LoadKeyholders(filename string) (keyholders KeyHolderManager, err error) {
-	users := make(map[int]bool)
+	users := make(map[string]bool)
 	keyholders = &keyholder{filename, users, &sync.Mutex{}}
 
 	data, err := ioutil.ReadFile(filename)
@@ -72,7 +81,7 @@ func LoadKeyholders(filename string) (keyholders KeyHolderManager, err error) {
 		return keyholders, nil
 	}
 
-	items := []int{}
+	items := []string{}
 	if err = json.Unmarshal(data, &items); err != nil {
 		return
 	}

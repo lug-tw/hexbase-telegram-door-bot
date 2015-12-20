@@ -76,29 +76,27 @@ class Doorctl:
         elif cmd == 'clean':
             self.clean()
 
-    def stop(self):
-        logging.info('Door STOP')
-        port = 25
+    def signal(self, port):
+        """
+        raise GPIO signal for 0.5 second on the specific port
+        """
+        logging.debug('signal on port {}'.format(port))
         GPIO.setup(port, GPIO.OUT)
         GPIO.output(port, 1)
         time.sleep(0.5)
         GPIO.output(port, 0)
+
+    def stop(self):
+        logging.info('Door STOP')
+        self.signal(port=25)
 
     def up(self):
         logging.info('Door UP')
-        port = 7
-        GPIO.setup(port, GPIO.OUT)
-        GPIO.output(port, 1)
-        time.sleep(0.5)
-        GPIO.output(port, 0)
+        self.signal(port=7)
 
     def down(self):
         logging.info('Door DOWN')
-        port = 8
-        GPIO.setup(port, GPIO.OUT)
-        GPIO.output(port, 1)
-        time.sleep(0.5)
-        GPIO.output(port, 0)
+        self.signal(port=8)
 
     def clean(self):
         GPIO.cleanup()

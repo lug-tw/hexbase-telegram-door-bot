@@ -31,7 +31,7 @@ export PATH=$PATH:$GOPATH/bin
 which goimports || go install golang.org/x/tools/cmd/goimports
 
 # fetch latest code
-go get -ud github.com/lug-tw/hexbase-telegram-door-bot
+go get -u -d github.com/lug-tw/hexbase-telegram-door-bot
 
 # hack, hack, hack
 cd $GOPATH/src/github.com/lug-tw/hexbase-telegram-door-bot

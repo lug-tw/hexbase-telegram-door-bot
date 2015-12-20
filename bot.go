@@ -132,6 +132,7 @@ func main() {
 		return
 	})
 
+	fmt.Println("Waiting messages.")
 	err = fsm.Start(30)
 	for err != nil {
 		log.Printf("Error happened: %s", err)

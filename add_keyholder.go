@@ -22,7 +22,9 @@ func (a *AddAskContact) Actions() (enter botgoram.Action, leave botgoram.Action)
 	enter = func(msg *telegram.Message, current botgoram.State, api telegram.API) error {
 		u := msg.Sender
 		if !a.Admins.Has(u) {
-			return fmt.Errorf("%s(%s-%d) is not admin", u.FirstName, u.Username, u.ID)
+			fmt.Errorf("in %s: %s(%s-%d) is not admin", a.Command, u.FirstName, u.Username, u.ID)
+			current.Transit("")
+			return nil
 		}
 		api.SendMessage(u, "Please send me a username (without @)", nil)
 		return nil

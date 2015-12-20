@@ -116,16 +116,7 @@ func main() {
 		1,
 	)
 
-	if _, err := fsm.MakeState(AuthAskPass("/auth")); err != nil {
-		log.Fatalf("Error registering state askpass: %s", err)
-	}
-	if _, err := fsm.MakeState(&AuthValidate{
-		StateName: "auth:validate",
-		Config:    otpcfg,
-		Admins:    admins,
-	}); err != nil {
-		log.Fatalf("Error registering state askpass: %s", err)
-	}
+	registerAuthStates(fsm, otpcfg, admins)
 
 	// register fallback
 	initState, _ := fsm.State("")

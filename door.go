@@ -40,21 +40,22 @@ func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 	defer fmt.Printf("[%s]: %s -> %s]\n",
 		message.Chat.Title, message.Sender.Username, message.Text)
 
-	if c.Admins.Has(message.Sender) || c.Members.Has(message.Sender) {
-		switch message.Text {
-		case "/ping":
-			c.Telegram.SendMessage(message.Chat,
-				"pong, "+message.Sender.FirstName+"!", nil)
-		case "/up":
-			c.chatCommand("up", message.Chat)
-		case "/down":
-			c.chatCommand("down", message.Chat)
-		case "/stop":
-			c.chatCommand("stop", message.Chat)
-		default:
-			return true
-		}
+	if !c.Admins.Has(message.Sender) && !c.Members.Has(message.Sender) {
+		return true
+	}
+	switch message.Text {
+	case "/ping":
+		c.Telegram.SendMessage(message.Chat,
+			"pong, "+message.Sender.FirstName+"!", nil)
+	case "/up":
+		c.chatCommand("up", message.Chat)
+	case "/down":
+		c.chatCommand("down", message.Chat)
+	case "/stop":
+		c.chatCommand("stop", message.Chat)
+	default:
+		return true
 	}
 
-	return
+	return false
 }

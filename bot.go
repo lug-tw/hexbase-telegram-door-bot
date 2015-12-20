@@ -110,9 +110,7 @@ func main() {
 
 	fsm := botgoram.NewBySender(
 		mock,
-		botgoram.MemoryStore(func(uid string) interface{} {
-			return true
-		}),
+		NewSL(),
 		1,
 	)
 

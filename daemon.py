@@ -13,6 +13,14 @@ testing:
 GPIO pins:
 
 https://www.raspberrypi.org/documentation/usage/gpio/images/a-and-b-gpio-numbers.png
+
+GPIO signal:
+
+    |port |roll-up door action|
+    |-------------------------|
+    |7    | UP                |
+    |25   | STOP              |
+    |8    | DOWN              |
 """
 
 import RPi.GPIO as GPIO

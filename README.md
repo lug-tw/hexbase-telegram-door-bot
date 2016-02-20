@@ -90,6 +90,15 @@ socat - UNIX-CONNECT:/tmp/doorctl
 
 ## Hardware
 
+- [Raspberry Pi Model A](https://www.raspberrypi.org/products/model-a/)
+- [文華 69 萬用 PCB](http://www.pcstore.com.tw/scshop/M09101350.htm)
+
+![img](http://i.imgur.com/NmVUbW7.jpg)
+
+![img](http://i.imgur.com/nbPgar1.jpg)
+
+### previous prototype
+
 - Our Raspberry Pi and the bread board
 
 ![img](https://i.imgur.com/yo0Fa0L.jpg)

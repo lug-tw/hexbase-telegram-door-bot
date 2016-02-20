@@ -93,9 +93,9 @@ socat - UNIX-CONNECT:/tmp/doorctl
 - [Raspberry Pi Model A](https://www.raspberrypi.org/products/model-a/)
 - [文華 69 萬用 PCB](http://www.pcstore.com.tw/scshop/M09101350.htm)
 
-![img](http://i.imgur.com/NmVUbW7.jpg)
+![img](https://i.imgur.com/7fgdw6Q.jpg)
 
-![img](http://i.imgur.com/nbPgar1.jpg)
+![img](https://i.imgur.com/nbPgar1.jpg)
 
 ### previous prototype
 

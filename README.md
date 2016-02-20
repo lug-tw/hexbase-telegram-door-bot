@@ -2,6 +2,8 @@
 
 A [telegram](https://telegram.org/) bot for the roll-up door of [HexBase](https://github.com/lug-tw/HexBase).
 
+![img](https://i.imgur.com/WfKYxtT.jpg)
+
 ## Available commands
 
 |command|  note         |

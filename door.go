@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"net"
 	"strings"
 
 	"github.com/Patrolavia/botgoram/telegram"
@@ -11,13 +11,13 @@ import (
 type DoorControl string
 
 func (d DoorControl) Send(cmd string) (err error) {
-	f, err := os.Create(string(d))
+	conn, err := net.Dial("unix", string(d))
 	if err != nil {
 		return
 	}
-	defer f.Close()
+	defer conn.Close()
 
-	_, err = fmt.Fprintln(f, cmd)
+	_, err = fmt.Fprintln(conn, cmd)
 	return
 }
 

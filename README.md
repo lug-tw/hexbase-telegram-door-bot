@@ -20,6 +20,26 @@ A [telegram](https://telegram.org/) bot for the roll-up door of [HexBase](https:
 - `python daemon.py`
 - `hexbase-telegram-door-bot -k 10_bytes_hexdecimal_string_as_secret_key -t your_token_file`
 
+# Installation
+```shell
+
+# clone the repo
+mkdir ~/dev && cd dev
+git clone https://github.com/lug-tw/hexbase-telegram-door-bot.git
+cd hexbase-telegram-door-bot/systemd
+
+
+# change path to /home/pi/dev/hexbase-telegram-door-bot
+vim  doorctl.service
+vim doorctl_systemd.sh
+
+
+# install systemd service
+cp doorctl.service .config/systemd/user/
+systemctl --user enable doorctl
+systemctl --user start doorctl
+```
+
 # Contribute
 
 ### Go part
@@ -42,9 +62,6 @@ goimports -w bot.go
 
 # cross compile to Raspberry Pi architecture
 GOARCH=arm go build -a
-
-# install
-scp hexbase-telegram-door-bot rspi:~/dev/door/
 ```
 
 ### Python
@@ -59,6 +76,17 @@ your_favorite_editor daemon.py
 # run syntax check
 flake8 daemon.py
 ```
+
+### Testing
+
+```shell
+# launch python daemon
+python daemon.py &
+
+socat - UNIX-CONNECT:/tmp/doorctl
+```
+
+
 
 ## Hardware
 

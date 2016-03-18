@@ -88,7 +88,9 @@ python daemon.py &
 socat - UNIX-CONNECT:/tmp/doorctl
 ```
 
+## Circuit design
 
+![img](layout.png)
 
 ## Hardware
 

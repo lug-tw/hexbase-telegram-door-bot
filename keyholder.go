@@ -6,13 +6,13 @@ import (
 	"os"
 	"sync"
 
-	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/Patrolavia/telegram"
 )
 
 type KeyHolderManager interface {
-	Add(user *telegram.User) (err error)
-	Remove(user *telegram.User) (err error)
-	Has(user *telegram.User) bool
+	Add(user *telegram.Victim) (err error)
+	Remove(user *telegram.Victim) (err error)
+	Has(user *telegram.Victim) bool
 	List() []string
 }
 
@@ -54,7 +54,7 @@ func (a *keyholder) List() []string {
 	return ret
 }
 
-func (a *keyholder) Add(user *telegram.User) (err error) {
+func (a *keyholder) Add(user *telegram.Victim) (err error) {
 	if user.Username == "" {
 		return
 	}
@@ -65,7 +65,7 @@ func (a *keyholder) Add(user *telegram.User) (err error) {
 	return export(a.filename, a.users)
 }
 
-func (a *keyholder) Remove(user *telegram.User) (err error) {
+func (a *keyholder) Remove(user *telegram.Victim) (err error) {
 	if user.Username == "" {
 		return
 	}
@@ -76,7 +76,7 @@ func (a *keyholder) Remove(user *telegram.User) (err error) {
 	return export(a.filename, a.users)
 }
 
-func (a *keyholder) Has(user *telegram.User) bool {
+func (a *keyholder) Has(user *telegram.Victim) bool {
 	if user.Username == "" {
 		return false
 	}

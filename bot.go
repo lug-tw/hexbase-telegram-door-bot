@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/Patrolavia/botgoram"
-	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/Patrolavia/telegram"
 	"github.com/dgryski/dgoogauth"
 )
 
@@ -69,8 +69,8 @@ func main() {
 	}
 	key := strings.TrimSpace(string(keyBytes))
 
-	api := telegram.New(key)
-	if _, err = api.Me(); err != nil {
+	api := telegram.New(key, nil)
+	if _, err = api.GetMe(); err != nil {
 		log.Fatalf("Error validating bot token: %s", err)
 	}
 
@@ -78,6 +78,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Cannot load admins from %s: %s", adminfile, err)
 	}
+	log.Printf("%#v", admins)
 	khs, err := LoadKeyholders(khfile)
 	if err != nil {
 		log.Fatalf("Cannot load keyholders from %s: %s", khfile, err)

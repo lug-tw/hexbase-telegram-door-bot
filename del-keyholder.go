@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Patrolavia/botgoram"
-	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/Patrolavia/telegram"
 )
 
 type DelAskContact struct {
@@ -21,31 +21,31 @@ func (a *DelAskContact) Name() string {
 
 func (a *DelAskContact) Actions() (enter botgoram.Action, leave botgoram.Action) {
 	enter = func(msg *telegram.Message, current botgoram.State, api telegram.API) error {
-		u := msg.Sender
+		u := msg.From
 		if !a.Admins.Has(u) {
 			return fmt.Errorf("%s(%s-%d) is not admin", u.FirstName, u.Username, u.ID)
 		}
 
 		// make up custom keyboard
-		kb := make([][]string, 1)
-		kb[0] = make([]string, 0, 4)
+		kb := make([][]telegram.KeyboardButton, 1)
+		kb[0] = make([]telegram.KeyboardButton, 0, 4)
 		for _, u := range a.KeyHolders.List() {
 			row := len(kb) - 1
 			col := len(kb[row]) - 1
 			if col >= 4 {
 				col = 0
-				kb = append(kb, make([]string, 0, 4))
+				kb = append(kb, make([]telegram.KeyboardButton, 0, 4))
 				row++
 			}
 
-			kb[row] = append(kb[row], u)
+			kb[row] = append(kb[row], telegram.KeyboardButton{Text: u})
 		}
 
-		api.SendMessage(u, "Please send me a username (without @)", &telegram.Options{
-			ReplyMarkup: &telegram.ReplyMarkup{
+		api.SendMessage(u.Identifier(), "Please send me a username (without @)", &telegram.Options{
+			ReplyMarkup: &telegram.ReplyKeyboardMarkup{
 				Keyboard: kb,
 				Resize:   true,
-				OneTime:  true,
+				Once:     true,
 			},
 		})
 		return nil
@@ -61,7 +61,7 @@ func (a *DelAskContact) Transitors() []botgoram.TransitorMap {
 				return
 			},
 			State:   "",
-			Type:    telegram.TEXT,
+			Type:    botgoram.TextMsg,
 			Command: a.Command,
 			Desc:    `Accepted /del command, prompt for contact info.`,
 		},
@@ -80,9 +80,9 @@ func (a *DelValidate) Actions() (enter botgoram.Action, leave botgoram.Action) {
 	enter = func(msg *telegram.Message, current botgoram.State, api telegram.API) error {
 		contact := strings.TrimSpace(msg.Text)
 
-		a.KeyHolders.Remove(&telegram.User{Username: contact})
-		api.SendMessage(current.User(), "Key holder deleted.", &telegram.Options{
-			ReplyMarkup: &telegram.ReplyMarkup{
+		a.KeyHolders.Remove(&telegram.Victim{Username: contact})
+		api.SendMessage(current.User().Identifier(), "Key holder deleted.", &telegram.Options{
+			ReplyMarkup: &telegram.ReplyKeyboardHide{
 				Hide: true,
 			},
 		})
@@ -100,7 +100,7 @@ func (a *DelValidate) Transitors() []botgoram.TransitorMap {
 				return
 			},
 			State: "delkh:askcontact",
-			Type:  telegram.TEXT,
+			Type:  botgoram.TextMsg,
 			Desc:  `Validate the contact info`,
 		},
 		botgoram.TransitorMap{
@@ -110,7 +110,7 @@ func (a *DelValidate) Transitors() []botgoram.TransitorMap {
 			},
 			IsHidden: true,
 			State:    "",
-			Type:     telegram.TEXT,
+			Type:     botgoram.TextMsg,
 			Desc:     `Done validating`,
 		},
 	}

@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"testing"
 
-	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/Patrolavia/telegram"
 )
 
-func initFile(uids []int) (fn string, err error) {
+func initFile(unames []string) (fn string, err error) {
 	f, err := ioutil.TempFile("", "KHM")
 	if err != nil {
 		return
@@ -17,7 +18,7 @@ func initFile(uids []int) (fn string, err error) {
 	defer f.Close()
 	fn = f.Name()
 
-	data, err := json.Marshal(uids)
+	data, err := json.Marshal(unames)
 	if err != nil {
 		return
 	}
@@ -25,12 +26,16 @@ func initFile(uids []int) (fn string, err error) {
 	return
 }
 
-func initUser(uid int) *telegram.User {
-	return &telegram.User{ID: uid}
+func initUser(uid int) *telegram.Victim {
+	return &telegram.Victim{ID: int64(uid), Username: strconv.FormatInt(int64(uid), 10)}
 }
 
 func loadKHM(uids []int) (kh KeyHolderManager, fn string, err error) {
-	fn, err = initFile(uids)
+	unames := make([]string, len(uids))
+	for idx, id := range uids {
+		unames[idx] = strconv.FormatInt(int64(id), 10)
+	}
+	fn, err = initFile(unames)
 	if err != nil {
 		return
 	}

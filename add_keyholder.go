@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Patrolavia/botgoram"
-	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/Patrolavia/telegram"
 )
 
 type AddAskContact struct {
@@ -20,13 +20,13 @@ func (a *AddAskContact) Name() string {
 
 func (a *AddAskContact) Actions() (enter botgoram.Action, leave botgoram.Action) {
 	enter = func(msg *telegram.Message, current botgoram.State, api telegram.API) error {
-		u := msg.Sender
+		u := msg.From
 		if !a.Admins.Has(u) {
-			fmt.Errorf("in %s: %s(%s-%d) is not admin", a.Command, u.FirstName, u.Username, u.ID)
+			err := fmt.Errorf("in %s: %s(%s-%d) is not admin", a.Command, u.FirstName, u.Username, u.ID)
 			current.Transit("")
-			return nil
+			return err
 		}
-		api.SendMessage(u, "Please send me a username (without @)", nil)
+		log.Print(api.SendMessage(u.Identifier(), "Please send me a username (without @)", nil))
 		return nil
 	}
 	return
@@ -40,7 +40,7 @@ func (a *AddAskContact) Transitors() []botgoram.TransitorMap {
 				return
 			},
 			State:   "",
-			Type:    telegram.TEXT,
+			Type:    botgoram.TextMsg,
 			Command: a.Command,
 			Desc:    `Accepted /add command, prompt for contact info.`,
 		},
@@ -59,8 +59,8 @@ func (a *AddValidate) Actions() (enter botgoram.Action, leave botgoram.Action) {
 	enter = func(msg *telegram.Message, current botgoram.State, api telegram.API) error {
 		contact := strings.TrimSpace(msg.Text)
 
-		a.KeyHolders.Add(&telegram.User{Username: contact})
-		api.SendMessage(current.User(), "Key holder added.", nil)
+		a.KeyHolders.Add(&telegram.Victim{Username: contact})
+		api.SendMessage(current.User().Identifier(), "Key holder added.", nil)
 		current.Transit("")
 		return nil
 	}
@@ -75,7 +75,7 @@ func (a *AddValidate) Transitors() []botgoram.TransitorMap {
 				return
 			},
 			State: "addkh:askcontact",
-			Type:  telegram.TEXT,
+			Type:  botgoram.TextMsg,
 			Desc:  `Validate the contact info`,
 		},
 		botgoram.TransitorMap{
@@ -85,7 +85,7 @@ func (a *AddValidate) Transitors() []botgoram.TransitorMap {
 			},
 			IsHidden: true,
 			State:    "",
-			Type:     telegram.TEXT,
+			Type:     botgoram.TextMsg,
 			Desc:     `Done validating`,
 		},
 	}

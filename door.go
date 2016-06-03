@@ -5,7 +5,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/Patrolavia/botgoram/telegram"
+	"github.com/Patrolavia/telegram"
 )
 
 type DoorControl string
@@ -28,26 +28,26 @@ type CommandProcesser struct {
 	Members  KeyHolderManager
 }
 
-func (c *CommandProcesser) chatCommand(cmd string, chat *telegram.Chat) {
+func (c *CommandProcesser) chatCommand(cmd string, chat *telegram.Victim) {
 	reply := "door " + cmd + "!"
 	if err := c.Control.Send(cmd); err != nil {
 		reply = fmt.Sprintf("Error sending command %s: %s", cmd, err)
 		fmt.Println(reply)
 	}
-	c.Telegram.SendMessage(chat, reply, nil)
+	c.Telegram.SendMessage(chat.Identifier(), reply, nil)
 }
 
 func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 	defer fmt.Printf("[%s]: %s -> %s]\n",
-		message.Chat.Title, message.Sender.Username, message.Text)
+		message.Chat.Title, message.From.Username, message.Text)
 
-	if !c.Admins.Has(message.Sender) && !c.Members.Has(message.Sender) {
+	if !c.Admins.Has(message.From) && !c.Members.Has(message.From) {
 		return true
 	}
 	switch message.Text {
 	case "/ping":
-		c.Telegram.SendMessage(message.Chat,
-			"pong, "+message.Sender.FirstName+"!", nil)
+		c.Telegram.SendMessage(message.Chat.Identifier(),
+			"pong, "+message.From.FirstName+"!", nil)
 	case "/up":
 		c.chatCommand("up", message.Chat)
 	case "/down":
@@ -55,7 +55,7 @@ func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 	case "/stop":
 		c.chatCommand("stop", message.Chat)
 	case "/list":
-		c.listHolders(message.Sender)
+		c.listHolders(message.From)
 	default:
 		return true
 	}
@@ -63,7 +63,7 @@ func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
 	return false
 }
 
-func (c *CommandProcesser) listHolders(u *telegram.User) {
+func (c *CommandProcesser) listHolders(u *telegram.Victim) {
 	mkstr := func(kl KeyHolderManager) (ret string) {
 		arr := kl.List()
 		if len(arr) > 0 {
@@ -81,5 +81,5 @@ Key holders:
 		mkstr(c.Admins),
 		mkstr(c.Members),
 	)
-	c.Telegram.SendMessage(u, reply, nil)
+	c.Telegram.SendMessage(u.Identifier(), reply, nil)
 }

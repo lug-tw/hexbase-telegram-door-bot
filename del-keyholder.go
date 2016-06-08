@@ -27,23 +27,15 @@ func (a *DelAskContact) Actions() (enter botgoram.Action, leave botgoram.Action)
 		}
 
 		// make up custom keyboard
-		kb := make([][]telegram.KeyboardButton, 1)
-		kb[0] = make([]telegram.KeyboardButton, 0, 4)
-		for _, u := range a.KeyHolders.List() {
-			row := len(kb) - 1
-			col := len(kb[row]) - 1
-			if col >= 4 {
-				col = 0
-				kb = append(kb, make([]telegram.KeyboardButton, 0, 4))
-				row++
-			}
-
-			kb[row] = append(kb[row], telegram.KeyboardButton{Text: u})
+		khs := a.KeyHolders.List()
+		khb := make([]telegram.KeyboardButton, 0, len(khs))
+		for _, u := range khs {
+			khb = append(khb, telegram.KeyboardButton{Text: u})
 		}
 
 		api.SendMessage(u.Identifier(), "Please send me a username (without @)", &telegram.Options{
 			ReplyMarkup: &telegram.ReplyKeyboardMarkup{
-				Keyboard: kb,
+				Keyboard: telegram.FormatKeyboard(khb, 2),
 				Resize:   true,
 				Once:     true,
 			},

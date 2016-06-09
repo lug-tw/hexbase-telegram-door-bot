@@ -16,32 +16,6 @@ import (
 	"github.com/dgryski/dgoogauth"
 )
 
-type MockTelegram struct {
-	telegram.API
-	Processer *CommandProcesser
-	max       int
-}
-
-func (m *MockTelegram) GetUpdates(offset, limit, timeout int) (updates []telegram.Update, err error) {
-	if offset < m.max {
-		offset = m.max
-	}
-	if updates, err = m.API.GetUpdates(offset, limit, timeout); err != nil {
-		return
-	}
-
-	ret := make([]telegram.Update, 0, len(updates))
-	for _, update := range updates {
-		if m.max <= update.ID {
-			m.max = update.ID + 1
-		}
-		if m.Processer.Handle(update.Message) {
-			ret = append(ret, update)
-		}
-	}
-	return ret, err
-}
-
 func main() {
 	var (
 		doorctl   string
@@ -99,20 +73,28 @@ func main() {
 			url.QueryEscape(otpuri),
 	)
 
-	mock := &MockTelegram{
-		API: api,
-		Processer: &CommandProcesser{
-			Control:  DoorControl(doorctl),
-			Telegram: api,
-			Admins:   admins,
-			Members:  khs,
-		},
+	cp := &CommandProcesser{
+		Control:  DoorControl(doorctl),
+		Telegram: api,
+		Admins:   admins,
+		Members:  khs,
+		In:       make(chan *telegram.Message),
+		Out:      make(chan *telegram.Message),
 	}
+	go cp.Process()
+
+	// long-polling
+	lp := &telegram.LongPollFetcher{
+		Message: cp.In,
+		API:     api,
+	}
+	go lp.Fetch(1, 30)
 
 	fsm := botgoram.NewBySender(
-		mock,
+		api,
 		NewSL(),
 		1,
+		cp.Out,
 	)
 
 	registerAuthStates(fsm, otpcfg, admins)

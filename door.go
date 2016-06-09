@@ -26,6 +26,8 @@ type CommandProcesser struct {
 	Telegram telegram.API
 	Admins   KeyHolderManager
 	Members  KeyHolderManager
+	In       chan *telegram.Message
+	Out      chan *telegram.Message
 }
 
 func (c *CommandProcesser) chatCommand(cmd string, chat *telegram.Victim) {
@@ -37,7 +39,15 @@ func (c *CommandProcesser) chatCommand(cmd string, chat *telegram.Victim) {
 	c.Telegram.SendMessage(chat.Identifier(), reply, nil)
 }
 
-func (c *CommandProcesser) Handle(message *telegram.Message) (pass bool) {
+func (c *CommandProcesser) Process() {
+	for msg := range c.In {
+		if c.handle(msg) {
+			c.Out <- msg
+		}
+	}
+}
+
+func (c *CommandProcesser) handle(message *telegram.Message) (pass bool) {
 	defer fmt.Printf("[%s]: %s -> %s]\n",
 		message.Chat.Title, message.From.Username, message.Text)
 

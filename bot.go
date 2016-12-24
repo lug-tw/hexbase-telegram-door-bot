@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"log/syslog"
 	"net/url"
 	"os"
 	"strings"
@@ -15,6 +16,18 @@ import (
 	"github.com/Patrolavia/telegram"
 	"github.com/dgryski/dgoogauth"
 )
+
+var logger *log.Logger
+
+func init() {
+	var err error
+	// log to syslog
+	logger, err = syslog.NewLogger(syslog.LOG_DAEMON|syslog.LOG_INFO, log.LstdFlags)
+
+	if err != nil {
+		log.Fatalf("cannot log to syslog: %s", err)
+	}
+}
 
 func main() {
 	var (
@@ -34,33 +47,33 @@ func main() {
 	flag.Parse()
 	// get named pipe to control door
 	if _, err := os.Stat(doorctl); err != nil {
-		log.Fatalf("doorctl %s does not exists!", doorctl)
+		logger.Fatalf("doorctl %s does not exists!", doorctl)
 	}
 
 	keyBytes, err := ioutil.ReadFile(tokenfile)
 	if err != nil {
-		log.Fatalf("Cannot load bot token from key file: %s\n", err)
+		logger.Fatalf("Cannot load bot token from key file: %s\n", err)
 	}
 	key := strings.TrimSpace(string(keyBytes))
 
 	api := telegram.New(key, nil)
 	if _, err = api.GetMe(); err != nil {
-		log.Fatalf("Error validating bot token: %s", err)
+		logger.Fatalf("Error validating bot token: %s", err)
 	}
 
 	admins, err := LoadKeyholders(adminfile)
 	if err != nil {
-		log.Fatalf("Cannot load admins from %s: %s", adminfile, err)
+		logger.Fatalf("Cannot load admins from %s: %s", adminfile, err)
 	}
-	log.Printf("%#v", admins)
+	logger.Printf("%#v", admins)
 	khs, err := LoadKeyholders(khfile)
 	if err != nil {
-		log.Fatalf("Cannot load keyholders from %s: %s", khfile, err)
+		logger.Fatalf("Cannot load keyholders from %s: %s", khfile, err)
 	}
 
 	secretBytes, err := hex.DecodeString(secretkey)
 	if err != nil || len(secretBytes) != 10 {
-		log.Fatalf("OTP secret is not 10bytes hexdecimal string!")
+		logger.Fatalf("OTP secret is not 10bytes hexdecimal string!")
 	}
 	otpcfg := &dgoogauth.OTPConfig{
 		Secret:     base32.StdEncoding.EncodeToString(secretBytes),
@@ -116,7 +129,7 @@ func main() {
 	fmt.Println("Waiting messages.")
 	err = fsm.Start(30)
 	for err != nil {
-		log.Printf("Error happened: %s", err)
+		logger.Printf("Error happened: %s", err)
 		err = fsm.Resume()
 	}
 }

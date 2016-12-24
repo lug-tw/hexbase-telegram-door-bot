@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/Patrolavia/botgoram"
@@ -115,13 +114,13 @@ func registerDelKHStates(fsm botgoram.FSM, admins KeyHolderManager, kh KeyHolder
 		Command:    "/del",
 	})
 	if err != nil {
-		log.Fatalf("Error registering state delkh:askcontact: %s", err)
+		logger.Fatalf("Error registering state delkh:askcontact: %s", err)
 	}
 
 	_, err = fsm.MakeState(&DelValidate{
 		KeyHolders: kh,
 	})
 	if err != nil {
-		log.Fatalf("Error registering state delkh:validate: %s", err)
+		logger.Fatalf("Error registering state delkh:validate: %s", err)
 	}
 }

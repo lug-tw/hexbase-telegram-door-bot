@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/Patrolavia/botgoram"
@@ -26,7 +25,7 @@ func (a *AddAskContact) Actions() (enter botgoram.Action, leave botgoram.Action)
 			current.Transit("")
 			return err
 		}
-		log.Print(api.SendMessage(u.Identifier(), "Please send me a username (without @)", nil))
+		logger.Print(api.SendMessage(u.Identifier(), "Please send me a username (without @)", nil))
 		return nil
 	}
 	return
@@ -97,13 +96,13 @@ func registerAddKHStates(fsm botgoram.FSM, admins KeyHolderManager, kh KeyHolder
 		Command: "/add",
 	})
 	if err != nil {
-		log.Fatalf("Error registering state addkh:askcontact: %s", err)
+		logger.Fatalf("Error registering state addkh:askcontact: %s", err)
 	}
 
 	_, err = fsm.MakeState(&AddValidate{
 		KeyHolders: kh,
 	})
 	if err != nil {
-		log.Fatalf("Error registering state addkh:validate: %s", err)
+		logger.Fatalf("Error registering state addkh:validate: %s", err)
 	}
 }

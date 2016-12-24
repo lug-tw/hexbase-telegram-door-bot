@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"strings"
 
 	"github.com/Patrolavia/botgoram"
@@ -91,13 +90,13 @@ func (a *AuthValidate) Transitors() []botgoram.TransitorMap {
 
 func registerAuthStates(fsm botgoram.FSM, otpcfg *dgoogauth.OTPConfig, admins KeyHolderManager) {
 	if _, err := fsm.MakeState(AuthAskPass("/auth")); err != nil {
-		log.Fatalf("Error registering state askpass: %s", err)
+		logger.Fatalf("Error registering state askpass: %s", err)
 	}
 	if _, err := fsm.MakeState(&AuthValidate{
 		StateName: "auth:validate",
 		Config:    otpcfg,
 		Admins:    admins,
 	}); err != nil {
-		log.Fatalf("Error registering state askpass: %s", err)
+		logger.Fatalf("Error registering state askpass: %s", err)
 	}
 }

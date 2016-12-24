@@ -22,7 +22,7 @@ var logger *log.Logger
 func init() {
 	var err error
 	// log to syslog
-	logger, err = syslog.NewLogger(syslog.LOG_DAEMON|syslog.LOG_INFO, log.LstdFlags)
+	logger, err = syslog.NewLogger(syslog.LOG_DAEMON|syslog.LOG_ERR, log.LstdFlags)
 
 	if err != nil {
 		log.Fatalf("cannot log to syslog: %s", err)

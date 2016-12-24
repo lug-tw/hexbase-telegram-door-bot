@@ -25,7 +25,7 @@ func (a *AddAskContact) Actions() (enter botgoram.Action, leave botgoram.Action)
 			current.Transit("")
 			return err
 		}
-		logger.Print(api.SendMessage(u.Identifier(), "Please send me a username (without @)", nil))
+		api.SendMessage(u.Identifier(), "Please send me a username (without @)", nil)
 		return nil
 	}
 	return
